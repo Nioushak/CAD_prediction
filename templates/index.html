@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coronary Artery Disease Prediction</title>
+</head>
+<body>
+    <h2>Coronary Artery Disease Prediction</h2>
+    <form action="/predict" method="post">
+        <label for="age">Age:</label>
+        <input type="text" id="age" name="age" required><br><br>
+        
+        <label for="sex">Sex (0 for female, 1 for male):</label>
+        <input type="text" id="sex" name="sex" required><br><br>
+        
+        <label for="chest_pain_type">Chest Pain Type:</label>
+        <input type="text" id="chest_pain_type" name="chest pain type" required><br><br>
+        
+        <label for="resting_bps">Resting Blood Pressure:</label>
+        <input type="text" id="resting_bps" name="resting bp s" required><br><br>
+        
+        <label for="cholesterol">Cholesterol:</label>
+        <input type="text" id="cholesterol" name="cholesterol" required><br><br>
+        
+        <label for="fasting_blood_sugar">Fasting Blood Sugar:</label>
+        <input type="text" id="fasting_blood_sugar" name="fasting blood sugar" required><br><br>
+        
+        <label for="resting_ecg">Resting Electrocardiographic Results:</label>
+        <input type="text" id="resting_ecg" name="resting ecg" required><br><br>
+        
+        <label for="max_heart_rate">Maximum Heart Rate:</label>
+        <input type="text" id="max_heart_rate" name="max heart rate" required><br><br>
+        
+        <label for="exercise_angina">Exercise Induced Angina (0 for no, 1 for yes):</label>
+        <input type="text" id="exercise_angina" name="exercise angina" required><br><br>
+        
+        <label for="oldpeak">ST Depression Induced by Exercise Relative to Rest:</label>
+        <input type="text" id="oldpeak" name="oldpeak" required><br><br>
+        
+        <label for="ST_slope">ST Slope:</label>
+        <input type="text" id="ST_slope" name="ST slope" required><br><br>
+        
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction_text %}
+    <div>
+        <h2>{{ prediction_text }}</h2>
+    </div>
+    {% endif %}
+</body>
+</html>
