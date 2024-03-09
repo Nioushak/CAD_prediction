@@ -302,34 +302,3 @@ print(confusion_matrix(y_test,gbc_predictions))
 # choosing Random forest
 import joblib
 joblib.dump(rf,"cad_model.pkl")
-
-
-# **Model Testing**
-
-# first test Pateint with No CAD
-
-
-Model = joblib.load('cad_model.pkl')
-Model.predict([[55,0,2,160,220,0,1,140,1,1.0,2]])
-
-
-# second test Pateint with CAD
-
-Model = joblib.load('cad_model.pkl')
-Model.predict([[45,1,1,110,264,0,0,132,0,1.2,2]])
-
-
-# 3rd test Pateint with No CAD
-
-Model = joblib.load('cad_model.pkl')
-Model.predict([[63,1,1,145,233,1,2,150,0,2.3,2]])
-
-
-# 4th Pateint with CAD
-
-Model = joblib.load('cad_model.pkl')
-Model.predict([[67,1,4,160,286,0,2,108,1,1.5,2]])
-
-# 5th test patient with no CAD
-model= joblib.load('cad_model.pkl')
-model.predict([[48,0,2,120,284,0,0,120,0,0,1]])
