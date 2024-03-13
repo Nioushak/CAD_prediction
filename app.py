@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 
 app = Flask(__name__)
-CORS(app)  # Initialize CORS with your Flask app
+CORS(app, origins='https://nioushaml-2024-1e2e83037d69.herokuapp.com')  # Initialize CORS with your Flask app and allow requests from the specified origin
 model = joblib.load('cad_model.pkl')
 
 @app.route("/", methods=['GET'])
