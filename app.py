@@ -1,11 +1,22 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS from flask_cors module
+from flask_cors import CORS
 import joblib
 import numpy as np
+import sqlite3
 
 app = Flask(__name__)
-CORS(app, origins='https://nioushaml-2024-1e2e83037d69.herokuapp.com')  # Initialize CORS with your Flask app and allow requests from the specified origin
+CORS(app, origins='https://nioushaml-2024-1e2e83037d69.herokuapp.com')
 model = joblib.load('cad_model.pkl')
+
+# Function to get patient data from the database
+def get_patient_data(patient_id):
+    conn = sqlite3.connect('patients.db')  # Connect to your SQLite database
+    cursor = conn.cursor()
+    query = "SELECT age, sex, chest_pain_type, resting_bps, cholesterol, fasting_blood_sugar, rest_ecg, max_heart_rate, exercise_angina, oldpeak, ST_slope FROM patients WHERE patient_id = ?"
+    cursor.execute(query, (patient_id,))
+    data = cursor.fetchone()  # Assuming patient_id is unique and only one record is returned
+    conn.close()
+    return data
 
 @app.route("/", methods=['GET'])
 def home():
@@ -15,27 +26,16 @@ def home():
 def cad_predict():
     try:
         data = request.get_json()
-        if 'input' not in data or len(data['input']) != 11:
-            return jsonify({"error": "Invalid input data"}), 400
+        if 'patient_id' not in data:
+            return jsonify({"error": "Patient ID is required"}), 400
         
-        input_values = data['input']
-        if not isinstance(input_values, dict):
-            return jsonify({"error": "Input data must be a JSON object with named values"}), 400
+        patient_id = data['patient_id']
+        patient_data = get_patient_data(patient_id)
+        if not patient_data:
+            return jsonify({"error": "Patient not found"}), 404
 
-        # Extract input values from the dictionary and ensure they are in correct order
-        input_array = np.array([
-            input_values.get("age"),
-            input_values.get("sex"),
-            input_values.get("chest_pain_type"),
-            input_values.get("resting_bps"),
-            input_values.get("cholesterol"),
-            input_values.get("fasting_blood_sugar"),
-            input_values.get("rest_ecg"),
-            input_values.get("max_heart_rate"),
-            input_values.get("exercise_angina"),
-            input_values.get("oldpeak"),
-            input_values.get("ST_slope")
-        ]).reshape(1, -1)
+        # Convert patient data to numpy array
+        input_array = np.array(patient_data).reshape(1, -1)
 
         pred = model.predict(input_array)
         
