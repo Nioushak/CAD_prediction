@@ -4,21 +4,26 @@ from flask_cors import CORS
 import numpy as np
 import mysql.connector
 import os
+import urllib.parse
 
 app = Flask(__name__)
 CORS(app)
 
 # Load model
-model = load('cad_model.pkl')  
-
+model = load('cad_model.pkl')
+  
 def get_db_connection():
-    # Establish a new connection using connection details from environment variables
+    # Retrieve the database URL from the environment variable
+    database_url = os.environ['DATABASE_URL']
+    url = urllib.parse.urlparse(database_url)
+
+    # Connect to the MySQL database using connection details from the URL
     return mysql.connector.connect(
-        host=os.environ.get('DB_HOST'),
-        user=os.environ.get('DB_USER'),
-        password=os.environ.get('DB_PASS'),
-        database=os.environ.get('DB_NAME'),
-        port=os.environ.get('DB_PORT', 3306)  # Default port is 3306 if not specified
+        host=url.hostname,
+        user=url.username,
+        password=url.password,
+        database=url.path[1:],  # Skip the leading '/'
+        port=url.port or 3306
     )
 
 @app.route('/insert_patient', methods=['POST'])
