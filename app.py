@@ -5,8 +5,8 @@ from flask_cors import CORS
 import numpy as np
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS with your specific origin
-model = load('cad_model.pkl')  # Load your ML model
+CORS(app)   
+
 
 # Connect to MySQL database
 db = mysql.connector.connect(
@@ -17,19 +17,21 @@ db = mysql.connector.connect(
     database="cad"
 )
 
+model = load('cad_model.pkl')  
+
 @app.route('/insert_patient', methods=['POST'])
 def insert_patient():
     # Get data from the request
     data = request.json
 
-    # Assuming your patient data structure, adjust the fields accordingly
+    
     patient_id = data.get('patient_id')
     age = data.get('age')
     sex = data.get('sex')
     chest_pain_type = data.get('chest_pain_type')
     resting_bps = data.get('resting_bps')
     cholesterol = data.get('cholesterol')
-    # Add more fields as per your model's requirements
+    
 
     # Insert data into MySQL table
     cursor = db.cursor()
@@ -37,14 +39,16 @@ def insert_patient():
     values = (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol)
     cursor.execute(query, values)
     db.commit()
+    
     cursor.close()
     return jsonify({'message': 'Patient data inserted successfully'}), 201
 
 @app.route('/predict', methods=['POST'])
 def predict():
     
+    data = request.json
     # Get patient_id from the request
-    patient_id = request.json.get('patient_id')
+    patient_id = data.get('patient_id')
 
     # Retrieve patient information from the database
     cursor = db.cursor()
@@ -56,8 +60,16 @@ def predict():
     if not patient_data:
         return jsonify({'error': 'Patient not found'}), 404
 
-    # Prepare input features for prediction based on your model's requirements
-    features = np.array([patient_data[1], patient_data[2], patient_data[3], patient_data[4], patient_data[5]]).reshape(1, -1)
+    # Prepare input features for prediction
+    features = [
+        
+        patient_data[0],  # age
+        patient_data[1],  # sex
+        patient_data[2],  # chest_pain_type
+        patient_data[3],  # resting_bps
+        patient_data[4],  # cholesterol
+]
+
     
     # Make prediction
     prediction = model.predict(features)[0]
