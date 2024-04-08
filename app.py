@@ -31,12 +31,18 @@ def insert_patient():
     chest_pain_type = data.get('chest_pain_type')
     resting_bps = data.get('resting_bps')
     cholesterol = data.get('cholesterol')
+    fasting_blood_sugar =  data.get('fasting_blood_sugar')
+    rest_ecg = data.get('rest_ecg')
+    max_heart_rate = data.get('max_heart_rate')
+    exercise_angina = data.get('exercise_angina')
+    oldpeak = data.get('oldpeak')
+    ST_slope = data.get('ST_slope')
     
 
     # Insert data into MySQL table
     cursor = db.cursor()
-    query = "INSERT INTO patient (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol) VALUES (%s, %s, %s, %s, %s, %s)"
-    values = (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol)
+    query = "INSERT INTO patient (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol, fasting_blood_sugar, rest_ecg, max_heart_rate, exercise_angina, oldpeak, ST_slope) VALUES (%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
+    values = (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol, fasting_blood_sugar, rest_ecg, max_heart_rate, exercise_angina, oldpeak, ST_slope )
     cursor.execute(query, values)
     db.commit()
     
@@ -61,18 +67,24 @@ def predict():
         return jsonify({'error': 'Patient not found'}), 404
 
     # Prepare input features for prediction
-    features = [
+    features = np.array([
         
         patient_data[0],  # age
         patient_data[1],  # sex
         patient_data[2],  # chest_pain_type
         patient_data[3],  # resting_bps
         patient_data[4],  # cholesterol
-]
+        patient_data[5], # fasting_blood_sugar
+        patient_data[6],  # rest_ecg
+        patient_data[7],  # max_heart_rate 
+        patient_data[8],  #exercise_angina
+        patient_data[9],  #oldpeak
+        patient_data[10],   #ST_slope
+]).reshape(1, -1)
 
     
     # Make prediction
-    prediction = model.predict(features)[0]
+    prediction = int(model.predict(features)[0])
     return jsonify({'prediction': prediction})
 
 if __name__ == '__main__':
