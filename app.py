@@ -106,7 +106,13 @@ def predict():
 
         features = np.array(patient_data).reshape(1, -1)
         prediction = model.predict(features)[0]
-        return jsonify({'prediction': int(prediction)})
+        if prediction == 1:
+            message = "You have coronary artery disease."
+        else:
+            message = "You do not have coronary artery disease."
+        
+        return jsonify({'prediction': int(prediction), 'message': message})
+    
     except mysql.connector.Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
