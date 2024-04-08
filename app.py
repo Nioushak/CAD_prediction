@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import mysql.connector
 from joblib import load
 from flask_cors import CORS
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS with your specific origin
@@ -22,7 +23,7 @@ def insert_patient():
     data = request.json
 
     # Assuming your patient data structure, adjust the fields accordingly
-    id = data.get('id')
+    patient_id = data.get('patient_id')
     age = data.get('age')
     sex = data.get('sex')
     chest_pain_type = data.get('chest_pain_type')
@@ -33,7 +34,7 @@ def insert_patient():
     # Insert data into MySQL table
     cursor = db.cursor()
     query = "INSERT INTO patient (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol) VALUES (%s, %s, %s, %s, %s, %s)"
-    values = (id, age, sex, chest_pain_type, resting_bps, cholesterol)
+    values = (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol)
     cursor.execute(query, values)
     db.commit()
     cursor.close()
@@ -43,12 +44,12 @@ def insert_patient():
 def predict():
     
     # Get patient_id from the request
-    id = request.json.get('id')
+    patient_id = request.json.get('patient_id')
 
     # Retrieve patient information from the database
     cursor = db.cursor()
     query = "SELECT * FROM patient WHERE patient_id = %s"
-    cursor.execute(query, (id,))
+    cursor.execute(query, (patient_id,))
     patient_data = cursor.fetchone()
     cursor.close()
 
