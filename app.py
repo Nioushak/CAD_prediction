@@ -27,6 +27,7 @@ def get_db_connection():
     )
 
 @app.route('/insert_patient', methods=['POST'])
+@app.route('/insert_patient', methods=['POST'])
 def insert_patient():
     data = request.json
     # Extract data from request
@@ -43,24 +44,27 @@ def insert_patient():
     oldpeak = data.get('oldpeak')
     ST_slope = data.get('ST_slope')
 
+    db = None
+    cursor = None
     try:
         db = get_db_connection()
         cursor = db.cursor()
         query = ("INSERT INTO patient (patient_id, age, sex, chest_pain_type, resting_bps, "
                  "cholesterol, fasting_blood_sugar, rest_ecg, max_heart_rate, exercise_angina, "
                  "oldpeak, ST_slope) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        values = (patient_id, data.get('age'), data.get('sex'), data.get('chest_pain_type'), 
-                  data.get('resting_bps'), data.get('cholesterol'), data.get('fasting_blood_sugar'), 
-                  data.get('rest_ecg'), data.get('max_heart_rate'), data.get('exercise_angina'), 
-                  data.get('oldpeak'), data.get('ST_slope'))
+        values = (patient_id, age, sex, chest_pain_type, resting_bps, cholesterol, fasting_blood_sugar,
+                  rest_ecg, max_heart_rate, exercise_angina, oldpeak, ST_slope)
         cursor.execute(query, values)
         db.commit()
         return jsonify({'message': 'Patient data inserted successfully'}), 201
     except mysql.connector.Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
-        cursor.close()
-        db.close()
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
