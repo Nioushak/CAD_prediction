@@ -14,7 +14,7 @@ model = load('cad_model.pkl')
   
 def get_db_connection():
     # Retrieve the database URL from the environment variable
-    database_url = os.environ['DATABASE_URL']
+    database_url = os.environ.get('DATABASE_URL', 'mysql://fgnt171t3pb9rbjx:m8ckuyqp25350bpm@pqxt96p7ysz6rn1f.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/mmnl46hxhxuoxi6c')
     url = urllib.parse.urlparse(database_url)
 
     # Connect to the MySQL database using connection details from the URL
