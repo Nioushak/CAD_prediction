@@ -18,7 +18,7 @@ def get_db_connection():
     url = urllib.parse.urlparse(database_url)
 
     # Connect to the MySQL database using connection details from the URL
-    return mysql.connector.connect(
+    connection = mysql.connector.connect(
         host=url.hostname,
         user=url.username,
         password=url.password,
@@ -26,7 +26,31 @@ def get_db_connection():
         port=url.port or 3306
     )
 
-@app.route('/insert_patient', methods=['POST'])
+    # Check if the patient table exists, if not, create it
+    cursor = connection.cursor()
+    cursor.execute("SHOW TABLES LIKE 'patient'")
+    if not cursor.fetchone():
+        create_table_query = """
+        CREATE TABLE patient (
+            patient_id INT AUTO_INCREMENT PRIMARY KEY,
+            age INT,
+            sex VARCHAR(10),
+            chest_pain_type VARCHAR(50),
+            resting_bps INT,
+            cholesterol INT,
+            fasting_blood_sugar VARCHAR(10),
+            rest_ecg VARCHAR(50),
+            max_heart_rate INT,
+            exercise_angina VARCHAR(10),
+            oldpeak FLOAT,
+            ST_slope VARCHAR(10)
+        )
+        """
+        cursor.execute(create_table_query)
+        connection.commit()
+
+    return connection
+
 @app.route('/insert_patient', methods=['POST'])
 def insert_patient():
     data = request.json
